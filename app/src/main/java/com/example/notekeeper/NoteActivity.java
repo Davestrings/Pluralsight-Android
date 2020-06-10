@@ -22,6 +22,8 @@ public class NoteActivity extends AppCompatActivity {
     private EditText mTextNoteTitle;
     private EditText mTextNoteText;
     private Spinner mSpinnerCourses;
+    private int mNotePosition;
+    private boolean mIsCancelling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +67,17 @@ public class NoteActivity extends AppCompatActivity {
         // mIsNewNote true if intent is passed and false otherwise
         mIsNewNote = position != POSITION_NOT_SET;
 
-        if(mIsNewNote)
-                mNote = DataManager.getInstance().getNotes().get(position);
+        if(mIsNewNote) {
+            mNote = DataManager.getInstance().getNotes().get(position);
+        }else{
+            createNewNote();
+        }
+    }
+
+    private void createNewNote() {
+        DataManager dm = DataManager.getInstance();
+        mNotePosition = dm.createNewNote(); 
+        mNote = dm.getNotes().get(mNotePosition);
     }
 
     @Override
@@ -74,6 +85,24 @@ public class NoteActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_note, menu);
         return true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mIsCancelling){
+            if(mIsNewNote)
+                DataManager.getInstance().removeNote(mNotePosition);
+        } else
+        saveNote();
+    }
+
+    private void saveNote() {
+        // set value of course in the note to whatever the value of the current
+        // course is in spinner
+        mNote.setCourse((CourseInfo) mSpinnerCourses.getSelectedItem());
+        mNote.setTitle(mTextNoteTitle.getText().toString());
+        mNote.setText(mTextNoteText.getText().toString());
     }
 
     @Override
@@ -87,6 +116,9 @@ public class NoteActivity extends AppCompatActivity {
         if (id == R.id.action_send_mail) {
             sendEmail();
             return true;
+        } else if (id == R.id.action_cancel){
+            mIsCancelling = true;
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
