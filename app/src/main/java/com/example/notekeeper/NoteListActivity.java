@@ -58,8 +58,8 @@ public class NoteListActivity extends AppCompatActivity {
                 //NoteActivity.class is the class we intend to open when a user clicks a note (pass an intent)
                 Intent intent = new Intent(NoteListActivity.this, NoteActivity.class);
                 // adding intent extra on click
-                NoteInfo note = (NoteInfo) listNotes.getItemAtPosition(position);
-                intent.putExtra(NoteActivity.NOTE_INFO, note);
+//                NoteInfo note = (NoteInfo) listNotes.getItemAtPosition(position);
+                intent.putExtra(NoteActivity.NOTE_POSITION, position);
 
                 startActivity(intent);
             }
